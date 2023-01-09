@@ -1,4 +1,10 @@
+import { knex } from 'knex';
 /* eslint-disable @typescript-eslint/no-var-requires */
+// import { ConfigModule } from '@nestjs/config';
+
+// ConfigModule.forRoot();
+import { CreateUserDto } from 'src/users/dto/create-user.dto';
+require('dotenv').config();
 export const config = {
   client: 'pg',
   connection: process.env.DB_CON,
@@ -13,40 +19,42 @@ export const pg = require('knex')({
 });
 
 export const NewTable = pg.schema
-  .createTable('test', (table) => {
-    table.increments('id');
-    table.string('name');
-    table.string('email');
-    table.string('password');
-    table.timestamp('created_at');
-    table.timestamp('updated_at');
-    table.integer('age');
-  })
-  .then(() => console.log('Table created'))
-  .catch((err) => console.log(err));
-
-export const NewUser = function (knex) {
-  return knex.schema.createTable(
+  .createTable(
     'users',
-    (table) => {
-      table.increments('id').primary();
-      table.string('name').notNullable();
-      table.string('email').notNullable();
-      table.string('password').notNullable();
-      table
-        .string('avatar')
-        .defaultTo(
-          'https://i.imgur.com/Xq2bZCY.png',
-        );
-      table
-        .string('bio')
-        .defaultTo('I am a new user');
-      table
-        .timestamp('created_at')
-        .defaultTo(knex.fn.now());
-      table
-        .timestamp('updated_at')
-        .defaultTo(knex.fn.now());
+    (table: {
+      increments: (arg0: string) => void;
+      string: (arg0: string) => void;
+      timestamp: (arg0: string) => void;
+      integer: (arg0: string) => void;
+    }) => {
+      table.increments('id');
+      table.string('name');
+      table.string('email');
+      table.string('password');
+      table.string('role');
+      table.integer('age');
+      table.timestamp('created_at');
     },
-  );
-};
+  )
+  .then(() => console.log('Table created'))
+  .catch((err: any) => console.log(err));
+
+export const CreateUser =
+  async function CreateUser(
+    createUserDto: CreateUserDto,
+  ) {
+    try {
+      await pg.schema.table('users').insert({
+        name: createUserDto.name,
+        email: createUserDto.email,
+        password: createUserDto.password,
+        role: createUserDto.role,
+        age: createUserDto.age,
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+export const dropTable =
+  pg.schema.dropTable('test1');
