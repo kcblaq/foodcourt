@@ -3,6 +3,7 @@ import {
   IsNotEmpty,
   IsString,
   IsStrongPassword,
+  IsNumber,
 } from 'class-validator';
 export class CreateUserDto {
   @IsNotEmpty()
@@ -18,5 +19,16 @@ export class CreateUserDto {
   @IsString()
   @IsStrongPassword()
   readonly password: string;
+
+  @IsNotEmpty()
+  @IsString()
   readonly role: string;
+
+  @IsNotEmpty()
+  @IsString()
+  readonly phone: string;
+
+  @IsNotEmpty()
+  @IsNumber()
+  readonly age: number;
 }

@@ -7,31 +7,21 @@ module.exports = {
   development: {
     client: 'pg',
     connection: process.env.DB_CON,
-  },
-
-  staging: {
-    client: 'pg',
-    connection: {
-      database: 'my_db',
-      user: 'username',
-      password: 'password',
-    },
     pool: {
-      min: 2,
-      max: 10,
+      min: 0,
+      max: 15,
     },
     migrations: {
-      tableName: 'knex_migrations',
+      directory: '/migrations',
+    },
+    seeds: {
+      directory: '/seeds',
     },
   },
 
   production: {
     client: 'pg',
-    connection: {
-      database: 'my_db',
-      user: 'username',
-      password: 'password',
-    },
+    connection: process.env.DB_CON,
     pool: {
       min: 2,
       max: 10,

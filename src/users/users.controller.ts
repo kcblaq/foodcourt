@@ -1,4 +1,3 @@
-import { Put } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import {
   Controller,
@@ -7,12 +6,13 @@ import {
   Body,
   Param,
   Delete,
+  Put,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import {
-  NewTable,
-  NewUser,
-} from 'src/db/config.db';
+// import {
+//   CreateUser,
+//   NewTable,
+// } from 'src/db/config.db';
 
 @Controller('users')
 export class UsersController {
@@ -22,26 +22,34 @@ export class UsersController {
 
   @Get()
   getAll() {
-    console.log('What if I do it');
     return this.usersService.getUser();
   }
+
+  @Post('dropusertable')
+  dropUserTable() {
+    return this.usersService.dropUserTable();
+  }
+
+  @Post('createusertable')
+  createUserTable() {
+    return this.usersService.userTable;
+  }
+
   @Get(':id')
   getOne(@Param() param): string {
     return `Here is user ${param.id}`;
   }
 
   @Post()
-  postUser(@Body() dto: CreateUserDto) {
-    return this.usersService.createUser(
-      dto.name,
-      dto.email,
-    );
+  postUser(@Body() dto: CreateUserDto): Promise<{
+    name: string;
+    email: string;
+    password: string;
+    role: string;
+  }> {
+    return this.usersService.createUser(dto);
   }
 
-  @Post('/test')
-  test() {
-    return NewUser;
-  }
   @Delete(':id')
   deleteUser(@Param('id') id) {
     return `Item ${id} has been deleted`;

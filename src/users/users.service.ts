@@ -1,27 +1,58 @@
 import { Injectable } from '@nestjs/common';
-import { config } from 'src/db/config.db';
+import { CreateUserDto } from './dto/create-user.dto';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const knex = require('knex')(config);
+require('dotenv').config();
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const con = process.env.DB_CON;
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+export const pg = require('knex')({
+  client: 'pg',
+  connection: con,
+  searchPath: ['knex', 'public'],
+});
+
 @Injectable()
 export class UsersService {
-  getUser() {
+  [x: string]: any;
+  async getUser() {
     try {
-      knex.schema.createTable(
-        'users',
-        (table) => {
-          table.increments('id').primary();
-          table.string('name');
-          table.string('email');
-          table.string('password');
-        },
-      );
-
-      return 'here on my knees to God';
+      const user = await pg.table('users');
+      return user;
     } catch (error) {
       console.log('Error loading users');
     }
   }
-  createUser(name: string, email: string) {
-    return `name: ${name}, email: ${email}`;
+
+  async createUser(createUserDto: CreateUserDto) {
+    try {
+      const { name, email, password, role, age } =
+        createUserDto;
+      const newUser = await pg
+        .table('users')
+        .insert({
+          name,
+          email,
+          password,
+          role,
+          age,
+        });
+      return newUser;
+    } catch (error) {
+      console.log(error.message);
+    }
   }
+
+  userTable = pg.schema
+    .createTable('users', (table) => {
+      table.increments('id');
+      table.string('name');
+      table.string('email').unique().notNull();
+      table.string('password');
+      table.string('role');
+      table.integer('age');
+      table.timestamp('created_at');
+    })
+    .then(() => console.log('User Table created'))
+    .catch((err: any) => console.log(err));
 }
